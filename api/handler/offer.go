@@ -2,6 +2,7 @@ package handler
 
 import (
 	"auction/pkg/offer"
+	"auction/pkg/user"
 	"encoding/json"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -13,6 +14,7 @@ import (
 func createOffer(service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var ofr *offer.Offer
+		usr := r.Context().Value("me").(*user.User)
 		errorMessage := "Error Creating Ofr"
 		err := json.NewDecoder(r.Body).Decode(&ofr)
 		if err != nil {
@@ -23,13 +25,14 @@ func createOffer(service offer.UseCase) http.Handler {
 		}
 
 		// check if offer data is valid else return error
-		if (ofr.BidPrice == 0) || (ofr.Title == "") {
-			log.Println("Missing Offer Data")
+		if !ofr.Validate() {
+			log.Println("Invalid Offer Data")
 			w.WriteHeader(http.StatusBadRequest)
 			w.Write([]byte("Invalid Offer Data"))
 			return
 		}
 		ofr.ID, err = service.Save(ofr)
+		ofr.CreatedBy = usr.Username
 
 		if err != nil {
 			log.Println(err.Error())
@@ -42,6 +45,8 @@ func createOffer(service offer.UseCase) http.Handler {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
 		}
+		w.Header().Set("Content-Type", "application/json")
+
 		w.WriteHeader(http.StatusCreated)
 
 	})

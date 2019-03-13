@@ -34,9 +34,9 @@ func GenerateJWT(user *User, key []byte) map[string]string {
 	claims := token.Claims.(jwt.MapClaims)
 
 	/* Set token claims */
-	claims["user"] = user
-	claims["userID"] = user.ID
-	claims["created"] = string(time.Now().Unix())
+	userid := user.ID.String()
+	claims["userID"] = userid
+	claims["created"] = time.Now().Unix()
 
 	/* Sign the token with our secret */
 	tokenString, _ := token.SignedString(key)

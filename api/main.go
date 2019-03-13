@@ -1,20 +1,23 @@
 package main
 
 import (
+	"auction/api/handler"
+	"auction/api/middleware"
+	"auction/pkg/bid"
 	"auction/pkg/offer"
+	"auction/pkg/user"
+	jwtmiddleware "github.com/auth0/go-jwt-middleware"
+	"github.com/codegangsta/negroni"
+	jwt "github.com/dgrijalva/jwt-go"
+	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
+	"github.com/juju/mgosession"
+	mgo "gopkg.in/mgo.v2"
 	"log"
 	"net/http"
 	"os"
 	"strconv"
 	"time"
-
-	"auction/api/handler"
-	"auction/pkg/user"
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/context"
-	"github.com/gorilla/mux"
-	"github.com/juju/mgosession"
-	mgo "gopkg.in/mgo.v2"
 )
 
 func main() {
@@ -26,6 +29,13 @@ func main() {
 
 	r := mux.NewRouter()
 
+	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
+		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
+			return []byte("this_is_the_end_hold_your_breath_and_count_to_10"), nil
+		},
+		SigningMethod: jwt.SigningMethodHS256,
+	})
+
 	mPool := mgosession.NewPool(nil, session, 50)
 	defer mPool.Close()
 
@@ -33,12 +43,22 @@ func main() {
 	userService := user.NewService(userRepo)
 	offerRepo := offer.CreateMongoRepository(mPool, "auction")
 	offerService := offer.NewService(offerRepo)
+	bidRepo := bid.CreateMongoRepository(mPool, "auction")
+	bidService := bid.NewService(bidRepo)
 	//handlers
-	n := negroni.New(
+	authMiddleware := negroni.New(
+		negroni.HandlerFunc(middleware.Cors),
 		negroni.NewLogger(),
 	)
-	handler.CreateUserHandlers(r, *n, userService)
-	handler.CreateOfferHandlers(r, *n, offerService)
+	apiMiddleware := negroni.New(
+		negroni.HandlerFunc(middleware.Cors),
+		negroni.HandlerFunc(jwtMiddleware.HandlerWithNext),
+		negroni.HandlerFunc(middleware.Login),
+		negroni.NewLogger(),
+	)
+	handler.CreateUserHandlers(r, *authMiddleware, userService)
+	handler.CreateOfferHandlers(r, *apiMiddleware, offerService)
+	handler.CreateBidHandlers(r, *apiMiddleware, bidService, offerService)
 
 	http.Handle("/", r)
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {

@@ -18,6 +18,7 @@ func signup(service user.UseCase) http.Handler {
 		var usr *user.User
 
 		err := json.NewDecoder(r.Body).Decode(&usr)
+		log.Println(usr.ID)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)

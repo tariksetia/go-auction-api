@@ -36,3 +36,8 @@ func (s *Service) FindByKey(key string, val interface{}, page int, size int) ([]
 func (s *Service) Query(page int, size int, sortkey string) ([]*Offer, error) {
 	return s.repo.Query(page, size, sortkey)
 }
+
+//Udapte
+func (s *Service) Update(id entity.ID, key string, val interface{}) (*Offer, error) {
+	return s.repo.Update(id, key, val)
+}

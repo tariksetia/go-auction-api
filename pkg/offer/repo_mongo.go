@@ -93,3 +93,23 @@ func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size 
 		return nil, err
 	}
 }
+
+//Update
+func (r *MongoRepository) Update(id entity.ID, key string, val interface{}) (*Offer, error) {
+	result := Offer{}
+	session := r.pool.Session(nil)
+	coll := session.DB(r.db).C("offers")
+	change := mgo.Change{
+		Update:    bson.M{"$set": bson.M{key: val}},
+		ReturnNew: true,
+	}
+	_, err := coll.Find(bson.M{"_id": id}).Apply(change, &result)
+	switch err {
+	case nil:
+		return &result, nil
+	case mgo.ErrNotFound:
+		return nil, entity.ErrNotFound
+	default:
+		return nil, err
+	}
+}
