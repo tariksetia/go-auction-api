@@ -31,8 +31,8 @@ func createOffer(service offer.UseCase) http.Handler {
 			w.Write([]byte("Invalid Offer Data"))
 			return
 		}
-		ofr.ID, err = service.Save(ofr)
 		ofr.CreatedBy = usr.Username
+		ofr.ID, err = service.Save(ofr)
 
 		if err != nil {
 			log.Println(err.Error())

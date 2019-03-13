@@ -27,7 +27,7 @@ func ComparePasswords(hashVal string, password string) bool {
 }
 
 //GenerateJWT
-func GenerateJWT(user *User, key []byte) map[string]string {
+func (user *User) GenerateJWT(key []byte) map[string]string {
 	token := jwt.New(jwt.SigningMethodHS256)
 
 	/* Create a map to store our claims */

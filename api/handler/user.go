@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auction/api/config"
 	"auction/pkg/entity"
 	"auction/pkg/user"
 	"encoding/json"
@@ -9,8 +10,6 @@ import (
 	"log"
 	"net/http"
 )
-
-var SIGNINGKEY = []byte("this_is_the_end_hold_your_breath_and_count_to_10")
 
 func signup(service user.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -52,6 +51,7 @@ func signup(service user.UseCase) http.Handler {
 }
 
 func login(service user.UseCase) http.Handler {
+	cfg := config.GetAppConfig()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading user"
 		var usr *user.User
@@ -89,7 +89,7 @@ func login(service user.UseCase) http.Handler {
 			w.Write([]byte(errorMessage))
 			return
 		}
-		jwtmap := user.GenerateJWT(userDatum, SIGNINGKEY)
+		jwtmap := userDatum.GenerateJWT([]byte(cfg.GetAppSecret()))
 		if err := json.NewEncoder(w).Encode(jwtmap); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
