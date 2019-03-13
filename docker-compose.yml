@@ -1,0 +1,24 @@
+version: "3"
+
+services:
+  auctiondb:
+    image: mongo
+    ports:
+        - "27017:27017"
+    container_name: auctiondb
+
+  webserver:
+    build:
+      context: ./..
+      dockerfile: ./auction/Dockerfile
+    environment:
+      - DB_HOST_DEV=auctiondb
+      - DB_PORT_DEV=27017
+      - DB_NAME_DEV=auction
+      - DB_CONNECTION_POOL_DEV=10
+      - APP_SECRET_DEV=this_is_the_end_hold_your_breath_and_count_to_10
+    ports:
+      - "8000:8000"
+    links:
+      - "auctiondb:database"
+    
