@@ -1,7 +1,7 @@
 package bid
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 	"github.com/juju/mgosession"
 	mgo "gopkg.in/mgo.v2"
 	bson "gopkg.in/mgo.v2/bson"
@@ -22,8 +22,8 @@ func CreateMongoRepository(p *mgosession.Pool, db string) Repository {
 }
 
 //Find : Get a Bid by ID
-func (r *MongoRepository) Find(id entity.ID) (*Bid, error) {
-	result := Bid{}
+func (r *MongoRepository) Find(id e.ID) (*e.Bid, error) {
+	result := e.Bid{}
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("bids")
 	err := coll.Find(bson.M{"_id": id}).One(&result)
@@ -31,31 +31,31 @@ func (r *MongoRepository) Find(id entity.ID) (*Bid, error) {
 	case nil:
 		return &result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //Store : Insert an Bid
-func (r *MongoRepository) Save(b *Bid) (entity.ID, error) {
+func (r *MongoRepository) Save(b *e.Bid) (e.ID, error) {
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("bids")
 	err := coll.Insert(b)
 	if err != nil {
-		return entity.ID(0), err
+		return e.ID(0), err
 	}
-	return b.ID, nil
+	return b.Id, nil
 }
 
 //FindByKey
-func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size int) ([]*Bid, error) {
+func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size int) ([]*e.Bid, error) {
 
 	if size == 0 {
 		size = 10
 	}
 
-	var res []*Bid
+	var res []*e.Bid
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("bids")
 	err := coll.Find(bson.M{key: val}).Limit(size).Skip(page).All(&res)
@@ -63,15 +63,15 @@ func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size 
 	case nil:
 		return res, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //Update
-func (r *MongoRepository) Update(id entity.ID, key string, val interface{}) (*Bid, error) {
-	result := Bid{}
+func (r *MongoRepository) Update(id e.ID, key string, val interface{}) (*e.Bid, error) {
+	result := e.Bid{}
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("bids")
 	change := mgo.Change{
@@ -83,7 +83,7 @@ func (r *MongoRepository) Update(id entity.ID, key string, val interface{}) (*Bi
 	case nil:
 		return &result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}

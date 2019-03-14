@@ -1,7 +1,7 @@
 package user
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 )
 
 //Service service interface
@@ -17,22 +17,22 @@ func NewService(r Repository) *Service {
 }
 
 //Save
-func (s *Service) Save(user *User) (entity.ID, error) {
-	user.ID = entity.NewID()
+func (s *Service) Save(user *e.User) (e.ID, error) {
+	user.Id = e.NewID()
 	return s.repo.Save(user)
 }
 
 //Find
-func (s *Service) Find(id entity.ID) (*User, error) {
+func (s *Service) Find(id e.ID) (*e.User, error) {
 	return s.repo.Find(id)
 }
 
 //FindByKey
-func (s *Service) FindByKey(key string, val interface{}) ([]*User, error) {
+func (s *Service) FindByKey(key string, val interface{}) ([]*e.User, error) {
 	return s.repo.FindByKey(key, val)
 }
 
 //FindByUsername
-func (s *Service) FindByUsername(username string) ([]*User, error) {
+func (s *Service) FindByUsername(username string) ([]*e.User, error) {
 	return s.repo.FindByKey("username", username)
 }

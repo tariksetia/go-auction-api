@@ -1,13 +1,12 @@
-package offer
+package entity
 
 import (
-	"auction/pkg/entity"
 	"time"
 )
 
 //Offer Entity Structure
 type Offer struct {
-	ID        entity.ID `json:"id" bson:"_id,omitempty"`
+	Id        ID        `json:"id" bson:"_id,omitempty"`
 	BidPrice  float64   `json:"bid_price"`
 	GoLive    time.Time `json:"go_live"`
 	Lifetime  int64     `json:"lifetime"`

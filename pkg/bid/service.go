@@ -1,7 +1,7 @@
 package bid
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 )
 
 //Service service interface
@@ -17,22 +17,22 @@ func NewService(r Repository) *Service {
 }
 
 //Save
-func (s *Service) Save(user *Bid) (entity.ID, error) {
-	user.ID = entity.NewID()
-	return s.repo.Save(user)
+func (s *Service) Save(bid *e.Bid) (e.ID, error) {
+	bid.Id = e.NewID()
+	return s.repo.Save(bid)
 }
 
 //Find
-func (s *Service) Find(id entity.ID) (*Bid, error) {
+func (s *Service) Find(id e.ID) (*e.Bid, error) {
 	return s.repo.Find(id)
 }
 
 //FindByKey
-func (s *Service) FindByKey(key string, val interface{}, page int, size int) ([]*Bid, error) {
+func (s *Service) FindByKey(key string, val interface{}, page int, size int) ([]*e.Bid, error) {
 	return s.repo.FindByKey(key, val, page, size)
 }
 
 //Udapte
-func (s *Service) Update(id entity.ID, key string, val interface{}) (*Bid, error) {
+func (s *Service) Update(id e.ID, key string, val interface{}) (*e.Bid, error) {
 	return s.repo.Update(id, key, val)
 }

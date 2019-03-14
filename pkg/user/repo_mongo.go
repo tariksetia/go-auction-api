@@ -1,7 +1,7 @@
 package user
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 	"github.com/juju/mgosession"
 	mgo "gopkg.in/mgo.v2"
 	bson "gopkg.in/mgo.v2/bson"
@@ -21,8 +21,8 @@ func CreateMongoRepo(p *mgosession.Pool, db string) Repository {
 }
 
 //Find : Get a offer by ID
-func (r *MongoRepository) Find(id entity.ID) (*User, error) {
-	result := User{}
+func (r *MongoRepository) Find(id e.ID) (*e.User, error) {
+	result := e.User{}
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("users")
 	err := coll.Find(bson.M{"_id": id}).One(&result)
@@ -30,26 +30,26 @@ func (r *MongoRepository) Find(id entity.ID) (*User, error) {
 	case nil:
 		return &result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //Store : Insert an offer
-func (r *MongoRepository) Save(user *User) (entity.ID, error) {
+func (r *MongoRepository) Save(user *e.User) (e.ID, error) {
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("users")
 	err := coll.Insert(user)
 	if err != nil {
-		return entity.ID(0), err
+		return e.ID(0), err
 	}
-	return user.ID, nil
+	return user.Id, nil
 }
 
 //FindByKey
-func (r *MongoRepository) FindByKey(key string, val interface{}) ([]*User, error) {
-	var result []*User
+func (r *MongoRepository) FindByKey(key string, val interface{}) ([]*e.User, error) {
+	var result []*e.User
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("users")
 	err := coll.Find(bson.M{key: val}).All(&result)
@@ -57,7 +57,7 @@ func (r *MongoRepository) FindByKey(key string, val interface{}) ([]*User, error
 	case nil:
 		return result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}

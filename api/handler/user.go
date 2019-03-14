@@ -2,7 +2,7 @@ package handler
 
 import (
 	"auction/api/config"
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 	"auction/pkg/user"
 	"encoding/json"
 	"github.com/codegangsta/negroni"
@@ -14,10 +14,10 @@ import (
 func signup(service user.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error sigining up user"
-		var usr *user.User
+		var usr *e.User
 
 		err := json.NewDecoder(r.Body).Decode(&usr)
-		log.Println(usr.ID)
+		log.Println(usr.Id)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -38,7 +38,7 @@ func signup(service user.UseCase) http.Handler {
 			return
 		}
 		usr.Password = user.SaltPassowrd(usr.Password)
-		usr.ID, err = service.Save(usr)
+		usr.Id, err = service.Save(usr)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -54,7 +54,7 @@ func login(service user.UseCase) http.Handler {
 	cfg := config.GetAppConfig()
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading user"
-		var usr *user.User
+		var usr *e.User
 		err := json.NewDecoder(r.Body).Decode(&usr)
 		if err != nil {
 			log.Println(err.Error())
@@ -84,7 +84,7 @@ func login(service user.UseCase) http.Handler {
 			return
 		}
 		w.Header().Set("Content-Type", "application/json")
-		if err != nil && err != entity.ErrNotFound {
+		if err != nil && err != e.ErrNotFound {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
 			return

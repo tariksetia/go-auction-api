@@ -1,16 +1,16 @@
 package user
 
-import "auction/pkg/entity"
+import e "auction/pkg/entity"
 
 type Repository interface {
-	Find(id entity.ID) (*User, error)
-	Save(user *User) (entity.ID, error)
-	FindByKey(key string, val interface{}) ([]*User, error)
+	Find(id e.ID) (*e.User, error)
+	Save(user *e.User) (e.ID, error)
+	FindByKey(key string, val interface{}) ([]*e.User, error)
 }
 
 type UseCase interface {
-	Find(id entity.ID) (*User, error)
-	Save(user *User) (entity.ID, error)
-	FindByKey(key string, val interface{}) ([]*User, error)
-	FindByUsername(username string) ([]*User, error)
+	Find(id e.ID) (*e.User, error)
+	Save(user *e.User) (e.ID, error)
+	FindByKey(key string, val interface{}) ([]*e.User, error)
+	FindByUsername(username string) ([]*e.User, error)
 }

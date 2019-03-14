@@ -1,7 +1,7 @@
 package offer
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 	"github.com/juju/mgosession"
 	mgo "gopkg.in/mgo.v2"
 	bson "gopkg.in/mgo.v2/bson"
@@ -22,8 +22,8 @@ func CreateMongoRepository(p *mgosession.Pool, db string) Repository {
 }
 
 //Find : Get a offer by ID
-func (r *MongoRepository) Find(id entity.ID) (*Offer, error) {
-	result := Offer{}
+func (r *MongoRepository) Find(id e.ID) (*e.Offer, error) {
+	result := e.Offer{}
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("offers")
 	err := coll.Find(bson.M{"_id": id}).One(&result)
@@ -31,25 +31,25 @@ func (r *MongoRepository) Find(id entity.ID) (*Offer, error) {
 	case nil:
 		return &result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //Store : Insert an offer
-func (r *MongoRepository) Save(b *Offer) (entity.ID, error) {
+func (r *MongoRepository) Save(o *e.Offer) (e.ID, error) {
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("offers")
-	err := coll.Insert(b)
+	err := coll.Insert(o)
 	if err != nil {
-		return entity.ID(0), err
+		return e.ID(0), err
 	}
-	return b.ID, nil
+	return o.Id, nil
 }
 
 //Query :query offers
-func (r *MongoRepository) Query(page int, size int, sortkey string) ([]*Offer, error) {
+func (r *MongoRepository) Query(page int, size int, sortkey string) ([]*e.Offer, error) {
 
 	if size == 0 {
 		size = 10
@@ -59,7 +59,7 @@ func (r *MongoRepository) Query(page int, size int, sortkey string) ([]*Offer, e
 		sortkey = "go_live"
 	}
 
-	var res []*Offer
+	var res []*e.Offer
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("offers")
 	err := coll.Find(nil).Sort(sortkey).Limit(size).Skip(page).All(&res)
@@ -67,20 +67,20 @@ func (r *MongoRepository) Query(page int, size int, sortkey string) ([]*Offer, e
 	case nil:
 		return res, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //FindByKey
-func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size int) ([]*Offer, error) {
+func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size int) ([]*e.Offer, error) {
 
 	if size == 0 {
 		size = 10
 	}
 
-	var res []*Offer
+	var res []*e.Offer
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("offers")
 	err := coll.Find(bson.M{key: val}).Limit(size).Skip(page).All(&res)
@@ -88,15 +88,15 @@ func (r *MongoRepository) FindByKey(key string, val interface{}, page int, size 
 	case nil:
 		return res, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}
 }
 
 //Update
-func (r *MongoRepository) Update(id entity.ID, key string, val interface{}) (*Offer, error) {
-	result := Offer{}
+func (r *MongoRepository) Update(id e.ID, key string, val interface{}) (*e.Offer, error) {
+	result := e.Offer{}
 	session := r.pool.Session(nil)
 	coll := session.DB(r.db).C("offers")
 	change := mgo.Change{
@@ -108,7 +108,7 @@ func (r *MongoRepository) Update(id entity.ID, key string, val interface{}) (*Of
 	case nil:
 		return &result, nil
 	case mgo.ErrNotFound:
-		return nil, entity.ErrNotFound
+		return nil, e.ErrNotFound
 	default:
 		return nil, err
 	}

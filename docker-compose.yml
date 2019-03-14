@@ -12,11 +12,14 @@ services:
       context: ./..
       dockerfile: ./auction/Dockerfile
     environment:
+      - APP_ENV=DEV
       - DB_HOST_DEV=auctiondb
       - DB_PORT_DEV=27017
       - DB_NAME_DEV=auction
       - DB_CONNECTION_POOL_DEV=10
-      - APP_SECRET_DEV=this_is_the_end_hold_your_breath_and_count_to_10
+      - APP_SERVER_PORT_DEV=8000
+      - APP_SECRET_DEV=
+
     ports:
       - "8000:8000"
     links:

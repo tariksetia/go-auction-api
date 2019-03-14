@@ -2,9 +2,8 @@ package handler
 
 import (
 	"auction/pkg/bid"
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 	"auction/pkg/offer"
-	"auction/pkg/user"
 	"encoding/json"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -15,9 +14,9 @@ import (
 
 func placeBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var _bid *bid.Bid
+		var _bid *e.Bid
 		errorMessage := "Error Placing Bid"
-		usr := r.Context().Value("me").(*user.User)
+		usr := r.Context().Value("me").(*e.User)
 		err := json.NewDecoder(r.Body).Decode(&_bid)
 		if err != nil {
 			log.Println(err.Error())
@@ -61,7 +60,7 @@ func placeBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler {
 		}
 		//save the bid
 		_bid.Username = usr.Username
-		_bid.ID, err = bidService.Save(_bid)
+		_bid.Id, err = bidService.Save(_bid)
 		if err != nil {
 			log.Println("Error Placing Bid")
 			w.WriteHeader(http.StatusInternalServerError)
@@ -84,7 +83,7 @@ func acceptBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler 
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		vars := mux.Vars(r)
 		id := vars["id"]
-		bidID := entity.StringToID(id)
+		bidID := e.StringToID(id)
 		errorMessage := "Error Accepting Bid"
 
 		// update Bid

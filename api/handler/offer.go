@@ -1,8 +1,8 @@
 package handler
 
 import (
+	e "auction/pkg/entity"
 	"auction/pkg/offer"
-	"auction/pkg/user"
 	"encoding/json"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
@@ -13,8 +13,8 @@ import (
 
 func createOffer(service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
-		var ofr *offer.Offer
-		usr := r.Context().Value("me").(*user.User)
+		var ofr *e.Offer
+		usr := r.Context().Value("me").(*e.User)
 		errorMessage := "Error Creating Ofr"
 		err := json.NewDecoder(r.Body).Decode(&ofr)
 		if err != nil {
@@ -32,7 +32,7 @@ func createOffer(service offer.UseCase) http.Handler {
 			return
 		}
 		ofr.CreatedBy = usr.Username
-		ofr.ID, err = service.Save(ofr)
+		ofr.Id, err = service.Save(ofr)
 
 		if err != nil {
 			log.Println(err.Error())
@@ -55,7 +55,7 @@ func createOffer(service offer.UseCase) http.Handler {
 func getOffer(service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		errorMessage := "Error reading Offers"
-		var ofrs []*offer.Offer
+		var ofrs []*e.Offer
 		page, err := strconv.Atoi(r.FormValue("page"))
 		if err != nil {
 			page = 0

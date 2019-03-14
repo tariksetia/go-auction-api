@@ -4,6 +4,7 @@ import (
 	"net/http"
 )
 
+//Cors middleware to allow CORS
 func Cors(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.Header().Set("Access-Control-Allow-Methods", "GET, POST, OPTIONS")

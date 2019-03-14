@@ -14,7 +14,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"strconv"
 	"time"
 )
 
@@ -46,12 +45,16 @@ func main() {
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.NewLogger(),
 	)
+
+	//Middleware for all other routes that require authentication
 	apiMiddleware := negroni.New(
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.HandlerFunc(middleware.JwtMiddleware(cfg)),
 		negroni.HandlerFunc(middleware.LoginMiddleware(userService)),
 		negroni.NewLogger(),
 	)
+
+	//create Handlers for different domain services
 	handler.CreateUserHandlers(r, *authMiddleware, userService)
 	handler.CreateOfferHandlers(r, *apiMiddleware, offerService)
 	handler.CreateBidHandlers(r, *apiMiddleware, bidService, offerService)
@@ -65,7 +68,7 @@ func main() {
 	srv := &http.Server{
 		ReadTimeout:  5 * time.Second,
 		WriteTimeout: 10 * time.Second,
-		Addr:         ":" + strconv.Itoa(8000),
+		Addr:         ":" + cfg.GetAppServerPort(),
 		Handler:      context.ClearHandler(http.DefaultServeMux),
 		ErrorLog:     logger,
 	}
@@ -73,4 +76,5 @@ func main() {
 	if err != nil {
 		log.Fatal(err.Error())
 	}
+	log.Println("Server is UP!!!!")
 }

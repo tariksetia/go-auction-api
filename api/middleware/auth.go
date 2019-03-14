@@ -12,7 +12,8 @@ import (
 	"time"
 )
 
-//LoginMiddleware Create Negroni based login middle, requre resference to userService as pointer
+//LoginMiddleware Create Negroni based login middleware, requre reference to userService as pointer
+//Attaches entity.User with request context as "me"
 func LoginMiddleware(userService *user.Service) negroni.HandlerFunc {
 	return negroni.HandlerFunc(func(w http.ResponseWriter, r *http.Request, next http.HandlerFunc) {
 
@@ -44,6 +45,7 @@ func LoginMiddleware(userService *user.Service) negroni.HandlerFunc {
 
 }
 
+//JwtMiddleware
 func JwtMiddleware(cfg *config.AppConfig) negroni.HandlerFunc {
 	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {

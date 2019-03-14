@@ -1,10 +1,8 @@
 package user
 
 import (
-	jwt "github.com/dgrijalva/jwt-go"
 	log "github.com/sirupsen/logrus"
 	"golang.org/x/crypto/bcrypt"
-	"time"
 )
 
 //As a standard practice we store hashed version of Password
@@ -24,24 +22,4 @@ func ComparePasswords(hashVal string, password string) bool {
 		return false
 	}
 	return true
-}
-
-//GenerateJWT
-func (user *User) GenerateJWT(key []byte) map[string]string {
-	token := jwt.New(jwt.SigningMethodHS256)
-
-	/* Create a map to store our claims */
-	claims := token.Claims.(jwt.MapClaims)
-
-	/* Set token claims */
-	userid := user.ID.String()
-	claims["userID"] = userid
-	claims["created"] = time.Now().Unix()
-
-	/* Sign the token with our secret */
-	tokenString, _ := token.SignedString(key)
-
-	jwtMap := map[string]string{"token": tokenString}
-
-	return jwtMap
 }

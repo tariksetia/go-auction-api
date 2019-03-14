@@ -1,7 +1,7 @@
 package offer
 
 import (
-	"auction/pkg/entity"
+	e "auction/pkg/entity"
 )
 
 //Service service interface
@@ -17,27 +17,27 @@ func NewService(r Repository) *Service {
 }
 
 //Save
-func (s *Service) Save(user *Offer) (entity.ID, error) {
-	user.ID = entity.NewID()
-	return s.repo.Save(user)
+func (s *Service) Save(offer *e.Offer) (e.ID, error) {
+	offer.Id = e.NewID()
+	return s.repo.Save(offer)
 }
 
 //Find
-func (s *Service) Find(id entity.ID) (*Offer, error) {
+func (s *Service) Find(id e.ID) (*e.Offer, error) {
 	return s.repo.Find(id)
 }
 
 //FindByKey
-func (s *Service) FindByKey(key string, val interface{}, page int, size int) ([]*Offer, error) {
+func (s *Service) FindByKey(key string, val interface{}, page int, size int) ([]*e.Offer, error) {
 	return s.repo.FindByKey(key, val, page, size)
 }
 
 //FindByUsername
-func (s *Service) Query(page int, size int, sortkey string) ([]*Offer, error) {
+func (s *Service) Query(page int, size int, sortkey string) ([]*e.Offer, error) {
 	return s.repo.Query(page, size, sortkey)
 }
 
 //Udapte
-func (s *Service) Update(id entity.ID, key string, val interface{}) (*Offer, error) {
+func (s *Service) Update(id e.ID, key string, val interface{}) (*e.Offer, error) {
 	return s.repo.Update(id, key, val)
 }
