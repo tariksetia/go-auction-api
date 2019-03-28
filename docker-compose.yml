@@ -9,8 +9,8 @@ services:
 
   webserver:
     build:
-      context: .
-      dockerfile: ./Dockerfile
+      context: ./..
+      dockerfile: ./auction/Dockerfile
     environment:
       - APP_ENV=DEV
       - DB_HOST_DEV=auctiondb

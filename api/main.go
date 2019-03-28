@@ -3,6 +3,7 @@ package main
 import (
 	"auction/api/config"
 	"auction/api/handler"
+	h "auction/api/infra/hub"
 	"auction/api/infra/mongo"
 	"auction/api/middleware"
 	"auction/pkg/bid"
@@ -31,7 +32,12 @@ func main() {
 	defer session.Close()
 	defer mPool.Close()
 
+	//Create The Hub
+	hub := h.GetHub()
+
+	//Create MUX router
 	r := mux.NewRouter()
+
 	userRepo := user.CreateMongoRepo(mPool, cfg.GetDatabaseName())
 	offerRepo := offer.CreateMongoRepository(mPool, cfg.GetDatabaseName())
 	bidRepo := bid.CreateMongoRepository(mPool, cfg.GetDatabaseName())
@@ -56,12 +62,16 @@ func main() {
 
 	//create Handlers for different domain services
 	handler.CreateUserHandlers(r, *authMiddleware, userService)
-	handler.CreateOfferHandlers(r, *apiMiddleware, offerService)
+	handler.CreateOfferHandlers(hub, r, *apiMiddleware, offerService)
 	handler.CreateBidHandlers(r, *apiMiddleware, bidService, offerService)
+	handler.CreateStreamHandler(r, *authMiddleware, hub)
 
 	http.Handle("/", r)
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
+	})
+	r.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
+		http.ServeFile(w, r, "index.html")
 	})
 
 	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)

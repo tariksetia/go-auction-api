@@ -1,10 +1,11 @@
 ################### Builder Stage  ######################################### 
-FROM golang:latest AS builder
-WORKDIR /go/src/auction
+FROM golang:alpine AS builder
+WORKDIR /go/src
 COPY . .
 RUN ls -l 
-RUN cd ./api && go get -d ../...
-RUN cd ./api && go build -o auctionServer
+RUN cd ./auction/api && go get -d ../...
+RUN cd ./auction/api && go build -o auctionServer
+RUN ls -l ./auction/api
 
 
 #################### Final Stage  ##########################################
@@ -12,5 +13,6 @@ FROM alpine
 
 WORKDIR /app
 COPY --from=builder /go/src/auction/api/auctionServer .
+RUN ls -l
 ENTRYPOINT ./auctionServer
 EXPOSE 8000

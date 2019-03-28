@@ -1,17 +1,21 @@
 package handler
 
 import (
+	"auction/api/infra/hub"
 	e "auction/pkg/entity"
 	"auction/pkg/offer"
 	"encoding/json"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
+	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"strconv"
 )
 
-func createOffer(service offer.UseCase) http.Handler {
+var upgrader = websocket.Upgrader{}
+
+func createOffer(hub *hub.Hub, service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var ofr *e.Offer
 		usr := r.Context().Value("me").(*e.User)
@@ -46,7 +50,7 @@ func createOffer(service offer.UseCase) http.Handler {
 			w.Write([]byte(errorMessage))
 		}
 		w.Header().Set("Content-Type", "application/json")
-
+		hub.Broadcast <- []byte("OfferCreated")
 		w.WriteHeader(http.StatusCreated)
 
 	})
@@ -54,6 +58,7 @@ func createOffer(service offer.UseCase) http.Handler {
 
 func getOffer(service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+
 		errorMessage := "Error reading Offers"
 		var ofrs []*e.Offer
 		page, err := strconv.Atoi(r.FormValue("page"))
@@ -83,9 +88,9 @@ func getOffer(service offer.UseCase) http.Handler {
 }
 
 //CreateUserHandlers Maps routes to http handlers
-func CreateOfferHandlers(r *mux.Router, n negroni.Negroni, service offer.UseCase) {
+func CreateOfferHandlers(hub *hub.Hub, r *mux.Router, n negroni.Negroni, service offer.UseCase) {
 	r.Handle("/v1/offer", n.With(
-		negroni.Wrap(createOffer(service)),
+		negroni.Wrap(createOffer(hub, service)),
 	)).Methods("POST", "OPTIONS").Name("CreateOffer")
 
 	r.Handle("/v1/offer", n.With(
