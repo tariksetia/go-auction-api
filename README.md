@@ -1,11 +1,11 @@
-#Go Auction API
+## Go Auction API
 
-###MISC Routes
+### MISC Routes
 - GET /ping: confirms that server is up and running
 - GET /index: html page for testing websocket events
 
 
-## API Routes
+### API Routes
 - POST /v1/signup
     REQUEST = {
         "username":"Azerbaijan",
