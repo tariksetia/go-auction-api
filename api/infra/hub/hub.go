@@ -30,12 +30,7 @@ func (hub *Hub) start() {
 			}
 		case message := <-hub.Broadcast:
 			for conn := range hub.Clients {
-				select {
-				case conn.Send <- message:
-				default:
-					close(conn.Send)
-					delete(hub.Clients, conn)
-				}
+				conn.Send <- message
 			}
 		}
 	}

@@ -18,7 +18,7 @@ services:
       - DB_NAME_DEV=auction
       - DB_CONNECTION_POOL_DEV=10
       - APP_SERVER_PORT_DEV=8000
-      - APP_SECRET_DEV=
+      - APP_SECRET_DEV="SECRETS BE TOLS"
 
     ports:
       - "8000:8000"

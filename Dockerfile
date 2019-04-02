@@ -13,6 +13,7 @@ FROM alpine
 
 WORKDIR /app
 COPY --from=builder /go/src/auction/api/auctionServer .
+COPY --from=builder /go/src/auction/api/index.html .
 RUN ls -l
 ENTRYPOINT ./auctionServer
 EXPOSE 8000

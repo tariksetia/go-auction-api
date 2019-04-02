@@ -7,13 +7,10 @@ import (
 	"encoding/json"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"
-	"github.com/gorilla/websocket"
 	"log"
 	"net/http"
 	"strconv"
 )
-
-var upgrader = websocket.Upgrader{}
 
 func createOffer(hub *hub.Hub, service offer.UseCase) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
@@ -51,7 +48,6 @@ func createOffer(hub *hub.Hub, service offer.UseCase) http.Handler {
 		}
 		w.Header().Set("Content-Type", "application/json")
 		hub.Broadcast <- []byte("OfferCreated")
-		w.WriteHeader(http.StatusCreated)
 
 	})
 }
