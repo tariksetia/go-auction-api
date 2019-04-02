@@ -43,7 +43,7 @@
 - GET /v1/offer or /v1/offeroffer?size=10&page=0&sortKey=golive
 
 - POST /v1/bid
-    REQUEST = {
+- - REQUEST = {
         "bid_price":6832427,
         "offer_id":"5ca34ac07688973b556056ce"
     }
