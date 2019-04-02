@@ -56,7 +56,7 @@ func (r *MongoRepository) Query(page int, size int, sortkey string) ([]*e.Offer,
 	}
 
 	if sortkey == "" {
-		sortkey = "go_live"
+		sortkey = "golive"
 	}
 
 	var res []*e.Offer

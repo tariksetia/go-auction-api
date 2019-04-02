@@ -40,8 +40,29 @@
         "sold": false
     }
 
-- GET /v1/offer or
+- GET /v1/offer or /v1/offeroffer?size=10&page=0&sortKey=golive
 
+- POST /v1/bid
+    REQUEST = {
+        "bid_price":6832427,
+        "offer_id":"5ca34ac07688973b556056ce"
+    }
 
+    RESPONSE = {
+        "id": "5ca34c2f7688973f34f8dee1",
+        "bid_price": 6832427,
+        "username": "tariksetia",
+        "offer_id": "5ca34ac07688973b556056ce",
+        "timestamp": "2019-04-02T17:19:03.799762+05:30",
+        "accepted": false
+    }
 
-  
+- PUT /vi/bid/:bidid
+    RESPONSE ={
+        "id": "5ca34c2f7688973f34f8dee1",
+        "bid_price": 6832427,
+        "username": "tariksetia",
+        "offer_id": "5ca34ac07688973b556056ce",
+        "timestamp": "2019-04-02T17:19:03.799+05:30",
+        "accepted": true
+    }
