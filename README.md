@@ -23,13 +23,18 @@
     }
 
 - POST /v1/offer
-    REQUEST = {
-        "bid_price": 12.34, (Required)
-        "lifetime": 0,      (Optional)
-        "photo_url": "",    (Optional)
-        "title": "Swiss Shales", (Required)
+    REQUEST
+    ```json
+    {
+        "bid_price": 12.34, //(Required)
+        "lifetime": 0,      //(Optional)
+        "photo_url": "",    //(Optional)
+        "title": "Swiss Shales", //(Required)
     }
-    RESPONSE = {
+    ```
+    RESPONSE
+    ```json
+    {
         "id": "5ca3414276889736ba1d7efd",
         "bid_price": 12.34,
         "go_live": "2019-04-02T16:32:26.596273+05:30",
@@ -39,16 +44,22 @@
         "created_by": "tariksetia",
         "sold": false
     }
+    ```
 
 - GET /v1/offer or /v1/offeroffer?size=10&page=0&sortKey=golive
 
 - POST /v1/bid
-- - REQUEST = {
+- - REQUEST
+     ```json
+    {
         "bid_price":6832427,
         "offer_id":"5ca34ac07688973b556056ce"
     }
+    ```
 
-    RESPONSE = {
+    Respone
+    ```json
+    {
         "id": "5ca34c2f7688973f34f8dee1",
         "bid_price": 6832427,
         "username": "tariksetia",
@@ -56,9 +67,12 @@
         "timestamp": "2019-04-02T17:19:03.799762+05:30",
         "accepted": false
     }
+    '''
 
 - PUT /vi/bid/:bidid
-    RESPONSE ={
+    RESPONSE
+    ```json
+    {
         "id": "5ca34c2f7688973f34f8dee1",
         "bid_price": 6832427,
         "username": "tariksetia",
@@ -66,3 +80,4 @@
         "timestamp": "2019-04-02T17:19:03.799+05:30",
         "accepted": true
     }
+    ```
