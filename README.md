@@ -32,7 +32,7 @@
     {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTU0MTk5NjA2LCJ1c2VySUQiOiI1Y2EzMzQzMjc2ODg5NzMxZjhhMjhmYzEifQ.1OPAlenPQu0hmLAcMrXYeKyNZK0WxAulIUhuNZgoVFA"
     }
-    '''
+    ```
 - POST /v1/offer
 
     Request
