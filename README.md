@@ -7,23 +7,34 @@
 
 ### API Routes
 - POST /v1/signup
-    REQUEST = {
+
+    Request
+    ```json
+    {
         "username":"Azerbaijan",
         "password":"baku"
     }
+    ```
 
 - POST /v1/login
-    REQUEST = {
+    
+    Request
+    ```json
+    {
         "username":"Azerbaijan",
         "password":"baku"
-    }
+    }```
 
-    RESPONSE = {
+    Response
+
+    ```json
+    {
         "token": "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTU0MTk5NjA2LCJ1c2VySUQiOiI1Y2EzMzQzMjc2ODg5NzMxZjhhMjhmYzEifQ.1OPAlenPQu0hmLAcMrXYeKyNZK0WxAulIUhuNZgoVFA"
     }
-
+    '''
 - POST /v1/offer
-    REQUEST
+
+    Request
     ```json
     {
         "bid_price": 12.34, //(Required)
@@ -32,7 +43,7 @@
         "title": "Swiss Shales", //(Required)
     }
     ```
-    RESPONSE
+    Response
     ```json
     {
         "id": "5ca3414276889736ba1d7efd",
@@ -49,7 +60,8 @@
 - GET /v1/offer or /v1/offeroffer?size=10&page=0&sortKey=golive
 
 - POST /v1/bid
-- - REQUEST
+    
+    Request
      ```json
     {
         "bid_price":6832427,
@@ -70,6 +82,7 @@
     '''
 
 - PUT /vi/bid/:bidid
+    
     RESPONSE
     ```json
     {
