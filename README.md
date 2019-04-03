@@ -23,7 +23,8 @@
     {
         "username":"Azerbaijan",
         "password":"baku"
-    }```
+    }
+    ```
 
     Response
 
@@ -62,7 +63,7 @@
 - POST /v1/bid
     
     Request
-     ```json
+    ```json
     {
         "bid_price":6832427,
         "offer_id":"5ca34ac07688973b556056ce"
@@ -79,7 +80,7 @@
         "timestamp": "2019-04-02T17:19:03.799762+05:30",
         "accepted": false
     }
-    '''
+    ```
 
 - PUT /vi/bid/:bidid
     
