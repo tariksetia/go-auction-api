@@ -1,6 +1,7 @@
 package handler
 
 import (
+	"auction/api/worker"
 	"auction/pkg/bid"
 	e "auction/pkg/entity"
 	"auction/pkg/offer"
@@ -12,10 +13,10 @@ import (
 	"net/http"
 )
 
-func placeBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler {
+func placeBid(bidService bid.UseCase, offerService offer.UseCase, broker *worker.Broker) http.Handler {
 	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 		var _bid *e.Bid
-		errorMessage := "Error Placing Bid"
+		//errorMessage := "Error Placing Bid"
 		usr := r.Context().Value("me").(*e.User)
 		err := json.NewDecoder(r.Body).Decode(&_bid)
 		if err != nil {
@@ -34,45 +35,22 @@ func placeBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler {
 		}
 
 		//get the offer by ID
-		ofr, err := offerService.Find(_bid.OfferID)
+		offer, err := offerService.Find(_bid.OfferID)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error Placing Bid"))
+			w.Write([]byte("Error Placing Bid, Could not find any offer"))
 			return
 		}
 
-		//check if current bid_price > old bid price
-		if ofr.BidPrice >= _bid.BidPrice {
-			log.Println("Error Placing Bid. BidPrice is lesser than previous value")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error Placing Bid. BidPrice is lesser than previous value"))
-			return
-		}
-
-		//update the bid_price in offer
-		ofr, err = offerService.Update(_bid.OfferID, "bidprice", _bid.BidPrice)
-		if err != nil {
-			log.Println("Error Placing Bid")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error Placing Bid"))
-			return
-		}
-		//save the bid
 		_bid.Username = usr.Username
-		_bid.Id, err = bidService.Save(_bid)
-		if err != nil {
-			log.Println("Error Placing Bid")
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte("Error Placing Bid"))
-			return
+		// Add it to channel
+		msg := e.BidChannelMessage{
+			BidEntity:   _bid,
+			OfferEntity: offer,
 		}
 
-		if err := json.NewEncoder(w).Encode(_bid); err != nil {
-			w.WriteHeader(http.StatusInternalServerError)
-			w.Write([]byte(errorMessage))
-		}
-		w.Header().Set("Content-Type", "application/json")
+		broker.BidQueue <- &msg
 
 		w.WriteHeader(http.StatusCreated)
 
@@ -86,7 +64,7 @@ func acceptBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler 
 		bidID := e.StringToID(id)
 		errorMessage := "Error Accepting Bid"
 
-		// update Bid
+		// update Bid if valid and greater than previous
 		_bid, err := bidService.Update(bidID, "accepted", true)
 		if err != nil {
 			log.Println(err.Error())
@@ -115,9 +93,11 @@ func acceptBid(bidService bid.UseCase, offerService offer.UseCase) http.Handler 
 }
 
 //CreateUserHandlers Maps routes to http handlers
-func CreateBidHandlers(r *mux.Router, n negroni.Negroni, bidService bid.UseCase, offerService offer.UseCase) {
+//Broker required as we are queueing all the bids and then processing them
+//TODO: Move to a persistent message broker, for this POC go channel is sufficient
+func CreateBidHandlers(r *mux.Router, n negroni.Negroni, broker *worker.Broker, bidService bid.UseCase, offerService offer.UseCase) {
 	r.Handle("/v1/bids", n.With(
-		negroni.Wrap(placeBid(bidService, offerService)),
+		negroni.Wrap(placeBid(bidService, offerService, broker)),
 	)).Methods("POST", "OPTIONS").Name("placeBid")
 
 	r.Handle("/v1/bids/{id}", n.With(

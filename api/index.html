@@ -13,14 +13,27 @@
     <script>
         var socket = new WebSocket("ws://localhost:8000/v1/stream");
         var button = document.getElementById("button");
+        var token = "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTU0OTMwNzc5LCJ1c2VySUQiOiI1Y2FkZTAxNDc2ODg5N2U0ZjNhOTU4NjEifQ.7s1fIOU9w2uVelGUtTtpr2bG-NmpB3wWdjY3oaOH8I4"
+        var msg= {
+            "token": token,
+            "event": "get_offers",
+            "page": 2,
+            "size": "100",
+            "sort_key": "golive"
+        }
         button.addEventListener("click", function(event){
             var text = document.getElementById("textbox").value;        
+            console.log(text)
             socket.send(text);
         });
         socket.onopen = function(event){
             console.log("Socket opened successfully");
         }
+        socket.onclose = function(event){
+            console.log("Socket closed successfully");
+        }
         socket.onmessage = function(event){
+            console.log(event)
             var box = document.createElement("div");
             box.innerHTML = event.data;
             document.getElementById("box").appendChild(box);

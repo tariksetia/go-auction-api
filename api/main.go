@@ -3,9 +3,11 @@ package main
 import (
 	"auction/api/config"
 	"auction/api/handler"
-	h "auction/api/infra/hub"
 	"auction/api/infra/mongo"
+	"auction/api/infra/stream"
 	"auction/api/middleware"
+	"auction/api/utils"
+	"auction/api/worker"
 	"auction/pkg/bid"
 	"auction/pkg/offer"
 	"auction/pkg/user"
@@ -32,8 +34,7 @@ func main() {
 	defer session.Close()
 	defer mPool.Close()
 
-	//Create The Hub
-	hub := h.GetHub()
+	
 
 	//Create MUX router
 	r := mux.NewRouter()
@@ -45,6 +46,18 @@ func main() {
 	userService := user.NewService(userRepo)
 	offerService := offer.NewService(offerRepo)
 	bidService := bid.NewService(bidRepo)
+
+	services := utils.Services{
+		User:  *userService,
+		Offer: *offerService,
+		Bid:   *bidService,
+	}
+
+	//Create The Hub
+	hub := stream.GetHub(&services)
+
+	//Create the Message Broker
+	broker := worker.GetOrCreateBroker(&services)
 
 	//Middleware for signup and login
 	authMiddleware := negroni.New(
@@ -63,8 +76,8 @@ func main() {
 	//create Handlers for different domain services
 	handler.CreateUserHandlers(r, *authMiddleware, userService)
 	handler.CreateOfferHandlers(hub, r, *apiMiddleware, offerService)
-	handler.CreateBidHandlers(r, *apiMiddleware, bidService, offerService)
-	handler.CreateStreamHandler(r, *authMiddleware, hub)
+	handler.CreateBidHandlers(r, *apiMiddleware, broker, bidService, offerService)
+	handler.CreateStreamHandler(r, *authMiddleware, hub, &services)
 
 	http.Handle("/", r)
 	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
