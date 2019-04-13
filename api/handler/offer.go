@@ -47,7 +47,12 @@ func createOffer(hub *stream.Hub, service offer.UseCase) http.Handler {
 			w.Write([]byte(errorMessage))
 		}
 		w.Header().Set("Content-Type", "application/json")
-		hub.Broadcast <- []byte("OfferCreated")
+		ofrstr, _ := json.Marshal(ofr)
+		outMsg := stream.SocketOutGoingMessage{
+			Message: "OfferCreated",
+			Data:    string(ofrstr),
+		}
+		hub.BroadcastJSON <- &outMsg
 
 	})
 }
@@ -82,8 +87,6 @@ func getOffer(service offer.UseCase) http.Handler {
 		}
 	})
 }
-
-
 
 //CreateUserHandlers Maps routes to http handlers
 func CreateOfferHandlers(hub *stream.Hub, r *mux.Router, n negroni.Negroni, service offer.UseCase) {

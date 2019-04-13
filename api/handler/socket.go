@@ -26,7 +26,6 @@ func StreamHandler(hub *h.Hub, services *utils.Services) http.Handler {
 			Send: make(chan []byte),
 		}
 
-		hub.AddClient <- client
 		go client.Write(hub)
 		go client.Read(hub)
 	})

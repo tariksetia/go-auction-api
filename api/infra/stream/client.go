@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"github.com/gorilla/websocket"
 	"time"
-
 )
 
 type Client struct {
@@ -53,9 +52,9 @@ func (c *Client) Read(hub *Hub) {
 		}
 
 		hubMessage := HubMessage{
-			Data: &socketMessage,
+			Data:   &socketMessage,
 			Client: c,
-			Hub: hub,
+			Hub:    hub,
 		}
 
 		hub.Incoming <- &hubMessage
@@ -71,12 +70,14 @@ func (c *Client) CloseWithError(err string) {
 	c.Ws.Close()
 }
 
-func (c *Client) SendError(err string){
+func (c *Client) SendError(err string) {
 	c.Ws.WriteMessage(websocket.TextMessage, []byte(err))
 }
 
-
-//
+/*
+RemoveAfter Once the websocket socket is authenticate, we calculate the time remaining (duration) for socket to expire
+This goroutine after sleeping for that duration, close the socket
+*/
 func (c *Client) RemoveAfter(duration int, hub *Hub) {
 	d := time.Duration(duration)
 	time.Sleep(d * time.Second)

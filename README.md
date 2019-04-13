@@ -96,4 +96,11 @@
     }
     ```
 
-  
+./hey -m POST -n 1 -c 1 \
+   -H "Content-Type: application/json" \
+   -H "Authorization: Bearer eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTU1MTU0ODc2LCJ1c2VySUQiOiI1Y2FkZTAxNDc2ODg5N2U0ZjNhOTU4NjEifQ.RAQ-yBwPRLRaNaa4EZSrSQ1l-QM2ekWuWwLq1Bx7KXc" \
+   -D ~/Lab/data.json \
+    http://localhost:8000/v1/offer
+
+
+{"event":"authenticate", "token":"eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJjcmVhdGVkIjoxNTU1MTUzMTkzLCJ1c2VySUQiOiI1Y2FkZTAxNDc2ODg5N2U0ZjNhOTU4NjEifQ.rjpbSsaPeJ8UoDkLwb6X8sr0SEsZVsqD703celjgDWI"}
