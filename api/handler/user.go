@@ -17,7 +17,6 @@ func signup(service user.UseCase) http.Handler {
 		var usr *e.User
 
 		err := json.NewDecoder(r.Body).Decode(&usr)
-		log.Println(usr.Id)
 		if err != nil {
 			log.Println(err.Error())
 			w.WriteHeader(http.StatusInternalServerError)
@@ -71,7 +70,7 @@ func login(service user.UseCase) http.Handler {
 		}
 
 		if data == nil {
-			w.WriteHeader(http.StatusNotFound)
+			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte("User Doesn't Exist"))
 			return
 		}
@@ -79,7 +78,7 @@ func login(service user.UseCase) http.Handler {
 		userDatum := data[0]
 
 		if !user.ComparePasswords(userDatum.Password, usr.Password) {
-			w.WriteHeader(http.StatusBadRequest)
+			w.WriteHeader(http.StatusForbidden)
 			w.Write([]byte("Password Doesnot Match"))
 			return
 		}
@@ -93,8 +92,11 @@ func login(service user.UseCase) http.Handler {
 		if err := json.NewEncoder(w).Encode(jwtmap); err != nil {
 			w.WriteHeader(http.StatusInternalServerError)
 			w.Write([]byte(errorMessage))
+			return
 		}
+		w.WriteHeader(http.StatusAccepted)
 	})
+
 }
 
 //CreateUserHandlers Maps routes to http handlers

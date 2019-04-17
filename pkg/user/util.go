@@ -18,7 +18,6 @@ func SaltPassowrd(password string) string {
 func ComparePasswords(hashVal string, password string) bool {
 	err := bcrypt.CompareHashAndPassword([]byte(hashVal), []byte(password))
 	if err != nil {
-		log.Error(err)
 		return false
 	}
 	return true

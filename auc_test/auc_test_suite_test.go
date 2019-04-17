@@ -1,4 +1,4 @@
-package main
+package auc_test_test
 
 import (
 	"auction/api/config"
@@ -11,31 +11,50 @@ import (
 	"auction/pkg/bid"
 	"auction/pkg/offer"
 	"auction/pkg/user"
+	testutils "auction/utils"
 	"github.com/codegangsta/negroni"
-	"github.com/gorilla/context"
 	"github.com/gorilla/mux"
-	"log"
-	"net/http"
-	"os"
-	"time"
+	"github.com/juju/mgosession"
+	. "github.com/onsi/ginkgo"
+	. "github.com/onsi/gomega"
+	"gopkg.in/mgo.v2"
+	"testing"
 )
 
-func main() {
+var mPool *mgosession.Pool
+var session *mgo.Session
+var r *mux.Router
+var services utils.Services
+var hub *stream.Hub
+var broker *worker.Broker
+var authMiddleware *negroni.Negroni
+var apiMiddleware *negroni.Negroni
 
-	//Get Application Config
-	cfg := config.GetAppConfig()
+func TestAucTest(t *testing.T) {
+	RegisterFailHandler(Fail)
+	RunSpecs(t, "AucTest Suite")
+}
 
-	//Connect to MongoDB
-	mPool, session := mongo.GetMongoPool(
+var _ = BeforeSuite(func() {
+	testutils.MongoStart()
+
+	cfg := config.AppConfig{
+		DBhost:         "0.0.0.0",
+		DBname:         "auction",
+		DBport:         27017,
+		ConnectionPool: 1,
+		AppSecret:      "SAMSUNG-H45-A-100-%-F0LD1NG-PH0N3",
+		AppServerPort:  8000,
+	}
+
+	mPool, session = mongo.GetMongoPool(
 		cfg.GetDatabaseHostname(),
 		cfg.GetDatabasePort(),
 		cfg.GetConnectionPool(),
 	)
-	defer session.Close()
-	defer mPool.Close()
 
 	//Create MUX router
-	r := mux.NewRouter()
+	r = mux.NewRouter()
 
 	userRepo := user.CreateMongoRepo(mPool, cfg.GetDatabaseName())
 	offerRepo := offer.CreateMongoRepository(mPool, cfg.GetDatabaseName())
@@ -45,28 +64,28 @@ func main() {
 	offerService := offer.NewService(offerRepo)
 	bidService := bid.NewService(bidRepo)
 
-	services := utils.Services{
+	services = utils.Services{
 		User:  *userService,
 		Offer: *offerService,
 		Bid:   *bidService,
 	}
 
 	//Create The Hub
-	hub := stream.GetHub(&services)
+	hub = stream.GetHub(&services)
 
 	//Create the Message Broker
-	broker := worker.GetOrCreateBroker(&services)
+	broker = worker.GetOrCreateBroker(&services)
 
 	//Middleware for signup and login
-	authMiddleware := negroni.New(
+	authMiddleware = negroni.New(
 		negroni.HandlerFunc(middleware.Cors),
 		negroni.NewLogger(),
 	)
 
 	//Middleware for all other routes that require authentication
-	apiMiddleware := negroni.New(
+	apiMiddleware = negroni.New(
 		negroni.HandlerFunc(middleware.Cors),
-		negroni.HandlerFunc(middleware.JwtMiddleware(cfg.GetAppSecret())),
+		negroni.HandlerFunc(middleware.JwtMiddleware(cfg.AppSecret)),
 		negroni.HandlerFunc(middleware.LoginMiddleware(userService)),
 		negroni.NewLogger(),
 	)
@@ -77,24 +96,11 @@ func main() {
 	handler.CreateBidHandlers(r, *apiMiddleware, broker, bidService, offerService)
 	handler.CreateStreamHandler(r, *authMiddleware, hub, &services)
 
-	http.Handle("/", r)
-	r.HandleFunc("/ping", func(w http.ResponseWriter, r *http.Request) {
-		w.WriteHeader(http.StatusOK)
-	})
-	r.HandleFunc("/index", func(w http.ResponseWriter, r *http.Request) {
-		http.ServeFile(w, r, "index.html")
-	})
+})
 
-	logger := log.New(os.Stderr, "logger: ", log.Lshortfile)
-	srv := &http.Server{
-		ReadTimeout:  5 * time.Second,
-		WriteTimeout: 10 * time.Second,
-		Addr:         ":" + cfg.GetAppServerPort(),
-		Handler:      context.ClearHandler(http.DefaultServeMux),
-		ErrorLog:     logger,
-	}
-	err := srv.ListenAndServe()
-	if err != nil {
-		log.Fatal(err.Error())
-	}
-}
+var _ = AfterSuite(func() {
+	testutils.MongoKill()
+	testutils.MongoRemove()
+	mPool.Close()
+	session.Close()
+})

@@ -1,7 +1,7 @@
 package handler
 
 import (
-	"auction/api/infra/stream"
+	"auction/api/stream"
 	e "auction/pkg/entity"
 	"auction/pkg/offer"
 	"encoding/json"

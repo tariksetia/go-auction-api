@@ -1,7 +1,7 @@
 package handler
 
 import (
-	h "auction/api/infra/stream"
+	h "auction/api/stream"
 	"auction/api/utils"
 	"github.com/codegangsta/negroni"
 	"github.com/gorilla/mux"

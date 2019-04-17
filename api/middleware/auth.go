@@ -1,7 +1,6 @@
 package middleware
 
 import (
-	"auction/api/config"
 	"auction/pkg/entity"
 	"auction/pkg/user"
 	"context"
@@ -46,10 +45,10 @@ func LoginMiddleware(userService *user.Service) negroni.HandlerFunc {
 }
 
 //JwtMiddleware
-func JwtMiddleware(cfg *config.AppConfig) negroni.HandlerFunc {
+func JwtMiddleware(secret string) negroni.HandlerFunc {
 	jwtMiddleware := jwtmiddleware.New(jwtmiddleware.Options{
 		ValidationKeyGetter: func(token *jwt.Token) (interface{}, error) {
-			return []byte(cfg.GetAppSecret()), nil
+			return []byte(secret), nil
 		},
 		SigningMethod: jwt.SigningMethodHS256,
 	})
