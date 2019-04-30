@@ -1,9 +1,10 @@
 ################### Builder Stage  ######################################### 
-FROM golang:alpine AS builder
-WORKDIR /go/src
+FROM golang:latest AS builder
+WORKDIR /go/src/auction
 COPY . .
 RUN ls -l 
-RUN cd ./auction/api && go get -d ../...
+RUN curl https://raw.githubusercontent.com/golang/dep/master/install.sh | sh
+RUN dep ensure
 RUN cd ./auction/api && go build -o auctionServer
 RUN ls -l ./auction/api
 
