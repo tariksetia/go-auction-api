@@ -11,13 +11,14 @@ import (
 	"auction/pkg/bid"
 	"auction/pkg/offer"
 	"auction/pkg/user"
-	"github.com/codegangsta/negroni"
-	"github.com/gorilla/context"
-	"github.com/gorilla/mux"
 	"log"
 	"net/http"
 	"os"
 	"time"
+
+	"github.com/codegangsta/negroni"
+	"github.com/gorilla/context"
+	"github.com/gorilla/mux"
 )
 
 func main() {
