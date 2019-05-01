@@ -130,7 +130,7 @@ docker-compose up
 - All the incoming messages Fans in at ```Incoming``` channel and based on the event type faned-out to different channels
 
 ## Broker
-- ```Broker``` package mimics message queues using channels, It is ok for the sake of this POC, but try to use standard bokers such as ActiveMQ, RabbitMq or Kafka in production. NATS dont provide message persistence
+- ```Broker``` package mimics message queues using channels, It is ok for the sake of this POC, but try to use standard bokers such as ActiveMQ, RabbitMq or Kafka in production. NATS dont provide message persistence AFAIK
 - Every ```Bid``` is queued once succefully validated
 - Later repective queue workers (goroutines) process the message.
 - Every ```Bid``` is proccessed sequentially and highest bid is updated in ```Offers```
